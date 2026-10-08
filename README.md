@@ -81,5 +81,6 @@ Setup permits additive catalog updates while preserving existing board bindings
 and encryption recipients. If it reports an incompatible policy change, retain
 your configuration and saved requests and contact the organizer.
 
-This repository distributes participant releases and includes the v0.2.4 client
-source. Install from a release bundle. No hosted service runs here.
+This repository publishes participant release bundles. The client source stays
+in the private benchmark repository. Install from a release bundle. No hosted
+service runs here.
