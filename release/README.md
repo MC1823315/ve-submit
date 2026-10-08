@@ -37,10 +37,13 @@ ve-submit hosted start \
   --model "Your scientific model description"
 ```
 
-The tool prompts privately for your own Yukon and VE staging API keys, checks
-the submission, and asks for authorization. Do not put keys in command arguments,
-source files, or research notes. Installing the tool does not grant membership
-or activate a board. Only use boards confirmed ready by the organizer.
+Put your Yukon dev key and personal VE staging key in the environment, or in
+`~/.config/ve-submit/.env` (mode `0600`). `VE_SUBMIT_ENV` can name another
+private file. The client does not read a `.env` inside the model checkout.
+A missing key is still requested at a hidden prompt. `hosted start` still asks
+you to confirm the submission. Do not put keys in command arguments, source
+files, or research notes. Installing the tool does not grant membership or
+activate a board. Only use boards confirmed ready by the organizer.
 
 Retain the printed run ID and the private files under
 `~/.local/state/ve-submit-hosted/`. If interrupted, follow the client's guidance

@@ -227,7 +227,7 @@ wheels = [
 
 [[package]]
 name = "ve-submit"
-version = "0.2.2"
+version = "0.2.4"
 source = { editable = "." }
 dependencies = [
     { name = "httpx" },
