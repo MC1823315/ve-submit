@@ -2,19 +2,19 @@
 
 Install the VirtualEmbryo staging submission client from one release bundle.
 
-**Current release: [v0.2.3-five-board-staging](https://github.com/MC1823315/ve-submit/releases/tag/v0.2.3-five-board-staging).**
-It is the v0.2.2 T2 staging client with the same board configuration. Yukon and
-VE keys can be read from the environment or a private env file. Install this
-bundle even if you already have v0.2.2.
+**Current release: [v0.2.4-five-board-staging](https://github.com/MC1823315/ve-submit/releases/tag/v0.2.4-five-board-staging).**
+It is the merged client: the v0.2.2 T2 staging configuration, environment key
+lookup, and the release source that belongs with that bundle. Install this
+bundle even if you already have v0.2.3.
 
 ## Install or update
 
 You need **Python 3.12 on macOS or Linux**. Windows users can use WSL.
 
 1. Download
-   [ve-submit-v0.2.3-five-board-staging.tar.gz](https://github.com/MC1823315/ve-submit/releases/download/v0.2.3-five-board-staging/ve-submit-v0.2.3-five-board-staging.tar.gz)
+   [ve-submit-v0.2.4-five-board-staging.tar.gz](https://github.com/MC1823315/ve-submit/releases/download/v0.2.4-five-board-staging/ve-submit-v0.2.4-five-board-staging.tar.gz)
    and its
-   [SHA-256 checksum](https://github.com/MC1823315/ve-submit/releases/download/v0.2.3-five-board-staging/ve-submit-v0.2.3-five-board-staging.tar.gz.sha256).
+   [SHA-256 checksum](https://github.com/MC1823315/ve-submit/releases/download/v0.2.4-five-board-staging/ve-submit-v0.2.4-five-board-staging.tar.gz.sha256).
 2. Verify the checksum and extract the archive.
 3. In the extracted directory, run:
 
@@ -81,5 +81,5 @@ Setup permits additive catalog updates while preserving existing board bindings
 and encryption recipients. If it reports an incompatible policy change, retain
 your configuration and saved requests and contact the organizer.
 
-This repository distributes participant releases and includes the v0.2.3 client
+This repository distributes participant releases and includes the v0.2.4 client
 source. Install from a release bundle. No hosted service runs here.
