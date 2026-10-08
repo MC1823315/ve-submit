@@ -1,86 +1,62 @@
-# ve-submit
+# ve-submit — consolidated VirtualEmbryo staging challenge
 
-Install the VirtualEmbryo staging submission client from one release bundle.
+This dev release replaces the previous staging challenges with one challenge
+containing five boards. Four boards are open for this release; T1 remains paused
+while Yukon’s artifact-selection issue is fixed. Previous dev submissions do not carry over.
 
-**Current release: [v0.2.4-staging](https://github.com/MC1823315/ve-submit/releases/tag/v0.2.4-staging).**
-It is the merged client: the v0.2.2 T2 staging configuration, environment key
-lookup, and the release source that belongs with that bundle. Install this
-bundle even if you already have v0.2.3.
+**Current release: [v0.2.3-consolidated-staging](https://github.com/MC1823315/ve-submit/releases/tag/v0.2.3-consolidated-staging).**
 
-## Install or update
+Use this release for the consolidated challenge, including if you previously
+installed v0.2.4-staging. The client code remains 0.2.3; this release name
+identifies the new five-board catalog. Access covers all five boards.
 
-You need **Python 3.12 on macOS or Linux**. Windows users can use WSL.
+## Install
 
-1. Download
-   [ve-submit-v0.2.4-staging.tar.gz](https://github.com/MC1823315/ve-submit/releases/download/v0.2.4-staging/ve-submit-v0.2.4-staging.tar.gz)
-   and its
-   [SHA-256 checksum](https://github.com/MC1823315/ve-submit/releases/download/v0.2.4-staging/ve-submit-v0.2.4-staging.tar.gz.sha256).
-2. Verify the checksum and extract the archive.
-3. In the extracted directory, run:
+Download the [release archive](https://github.com/MC1823315/ve-submit/releases/download/v0.2.3-consolidated-staging/ve-submit-v0.2.3-consolidated-staging.tar.gz)
+and its [checksum](https://github.com/MC1823315/ve-submit/releases/download/v0.2.3-consolidated-staging/ve-submit-v0.2.3-consolidated-staging.tar.gz.sha256). Verify the checksum,
+extract the archive, and enter the extracted directory. Python 3.12 is required.
 
-   ```sh
-   python3.12 -I install.py
-   ```
-
-Setup verifies the bundled client/configuration and installs hash-locked
-dependencies from PyPI. It uses a dedicated environment, requires no
-administrator access, and does not request API keys or submit a model.
-An update preserves previous installations and private saved requests.
-
-Run `~/.local/bin/ve-submit hosted start --help`. To use `ve-submit` by name,
-add this to your shell profile:
+If you installed an earlier VE staging client, remove its two old staging
+configuration files before installing this replacement catalog:
 
 ```sh
-export PATH="$HOME/.local/bin:$PATH"
+rm -f "$HOME/.config/ve-submit/hosted-policy.json" \
+      "$HOME/.config/ve-submit/hosted-catalog.json"
+python3.12 -I install.py
 ```
+
+For a first installation, only the second command is needed. Installation does
+not ask for keys or submit a model. The bundle's generic instructions describe
+an older pilot alongside additional boards; this release uses only the new
+five-board catalog and the explicit board selections below.
 
 ## Submit
 
-Complete the organizer's account activation and model/data preparation first.
-Installation does not grant contest membership or activate compute.
+Choose a board explicitly:
 
-For the current human-team T2 heart-interpolation pilot:
+| Board | Selection |
+|---|---|
+| T1 temporal — paused | `t1-temporal-val` |
+| T2 embryo interpolation | `t2-embryo-interp` |
+| T2 heart extrapolation | `t2-heart-extrap` |
+| T2 heart interpolation | `t2-heart-interp` |
+| T3 Gata4 | `t3-gata4` |
 
 ```sh
-ve-submit hosted start \
-  --checkout /absolute/path/to/your/model-checkout \
+~/.local/bin/ve-submit hosted start \
+  --board t2-heart-interp \
+  --checkout /absolute/path/to/model-checkout \
   --note /absolute/path/to/research-note.txt \
-  --model "Your scientific model description"
+  --model "Your model description"
 ```
 
-Put your Yukon dev key and personal VE staging key in the environment, or in
-`~/.config/ve-submit/.env` (mode `0600`). `VE_SUBMIT_ENV` can name another
-private file. The client does not read a `.env` inside the model checkout.
+The client privately requests your own Yukon and VE staging keys. Keep the
+printed run ID. If a new-challenge submission is interrupted, resume that
+saved request with `ve-submit hosted submit RUN_ID`.
 
-```sh
-YUKON_API_TOKEN=your-yukon-dev-key
-VE_API_KEY=your-ve-staging-key
-```
+Each of the four open boards has two concurrent workflows. T1 rejects new submissions while paused. VE account
+quotas continue to apply independently of these workflow slots.
 
-A missing key is still requested at a hidden prompt. `hosted start` still asks
-you to confirm the submission. Keep keys out of command arguments, model
-source, and research notes.
-
-Save the printed run ID and the files under `~/.local/state/ve-submit-hosted/`.
-If interrupted, follow the client's instructions to retry the original saved
-request with `ve-submit hosted submit RUN_ID`. Do not start another submission
-to recover an uncertain upload.
-
-## Saved requests and additional boards
-
-New T2 submissions now use the installed T2 catalog configuration by default.
-Saved requests retain their original configuration. Updating the tool does not
-retry failed submissions or recover their scores; ask the organizer about a
-previously failed submission before starting a replacement.
-
-Configuration for four additional staging boards is included. Only use those
-boards once the organizer confirms activation, with the documented `--board`
-selection.
-
-Setup permits additive catalog updates while preserving existing board bindings
-and encryption recipients. If it reports an incompatible policy change, retain
-your configuration and saved requests and contact the organizer.
-
-This repository publishes participant release bundles. The client source stays
-in the private benchmark repository. Install from a release bundle. No hosted
-service runs here.
+This repository distributes participant client bundles. Installation does not
+grant challenge membership. Client source remains in the private benchmark
+repository; install from the release archive.
