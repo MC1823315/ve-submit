@@ -2,12 +2,13 @@
 import argparse
 from contextlib import ExitStack
 from datetime import datetime, timedelta, timezone
-import getpass
+import os
 from pathlib import Path
 import sys
 from types import SimpleNamespace
 
 from . import secure
+from .secrets import SecretFileError, YUKON_API_TOKEN, VE_API_KEY, configured_values, has_secret, prompt_secret
 from .contracts import (canonical_sha256, identifier, strict_json, IdentityMismatch,
     AuthenticationRequired, QuotaWait, Pending, ReconciliationRequired)
 from .envelope import TrackEnvelopeContext, BoardEnvelopeContext, PACKAGE_OVERHEAD, context_track, package_size
@@ -62,7 +63,10 @@ def main(argv=None):
         commands.add_parser(command).add_argument("run_id")
     args = parser.parse_args(argv)
     try:
-        if not sys.stdin.isatty() or not sys.stderr.isatty():
+        file_values = configured_values()
+        # start still confirms the upload in the terminal. Other commands only need a terminal when a key is missing.
+        needs_terminal = args.command == "start" or not has_secret(YUKON_API_TOKEN, os.environ, file_values)
+        if needs_terminal and (not sys.stdin.isatty() or not sys.stderr.isatty()):
             raise ValueError("private interactive terminal required")
         base = Path.home().resolve() / ".local/state/ve-submit-hosted"
         config_path = Path.home().resolve() / ".config/ve-submit"
@@ -86,7 +90,7 @@ def main(argv=None):
         if args.command == "start" and policy_path.is_relative_to(args.checkout.resolve()):
             raise ValueError("install trusted policy outside candidate source")
         with ExitStack() as resources:
-            yukon = HostedYukonClient(getpass.getpass("Your Yukon API key (hidden): "), policy)
+            yukon = HostedYukonClient(prompt_secret("Your Yukon API key", YUKON_API_TOKEN, os.environ, file_values), policy)
             resources.callback(yukon.close)
             if args.command == "start":
                 config = yukon.check_config()
@@ -100,7 +104,7 @@ def main(argv=None):
                 root, frozen, items = freeze_hosted_inputs(args.checkout, base, evidence, binding=policy.binding)
                 if sum(i["bytes"] for i, _ in items) + PACKAGE_OVERHEAD > config["maxBytes"]:
                     raise ValueError("package exceeds configured size limit")
-                key = getpass.getpass("Your personal VE API key (hidden): ")
+                key = prompt_secret("Your personal VE API key", VE_API_KEY, os.environ, file_values)
                 ve = VEClient(key, policy.pilot, binding=policy.binding); resources.callback(ve.close)
                 identity = _identity(yukon, ve, policy.pilot, policy.binding)
                 cls = BoardEnvelopeContext if policy.binding else TrackEnvelopeContext
@@ -142,6 +146,9 @@ def main(argv=None):
                     print("Yukon submission: " + submission_id)
                     print("Expired authorization or uncertain uploads require operator reconciliation.")
         return 0
+    except SecretFileError as error:
+        print(str(error), file=sys.stderr)
+        return 2
     except HostedConflict as error:
         print("This candidate already exists. Use its saved original request or request manual reconciliation.", file=sys.stderr)
         if error.existing_submission_id:

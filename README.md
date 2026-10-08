@@ -48,9 +48,18 @@ ve-submit hosted start \
   --model "Your scientific model description"
 ```
 
-Enter your own Yukon and VE staging keys only at the hidden prompts. Review the
-selected identity and board, then authorize the submission. Keep keys out of
-command arguments, model source, and research notes.
+Put your Yukon dev key and personal VE staging key in the environment, or in
+`~/.config/ve-submit/.env` (mode `0600`). `VE_SUBMIT_ENV` can name another
+private file. The client does not read a `.env` inside the model checkout.
+
+```sh
+YUKON_API_TOKEN=your-yukon-dev-key
+VE_API_KEY=your-ve-staging-key
+```
+
+A missing key is still requested at a hidden prompt. `hosted start` still asks
+you to confirm the submission. Keep keys out of command arguments, model
+source, and research notes.
 
 Save the printed run ID and the files under `~/.local/state/ve-submit-hosted/`.
 If interrupted, follow the client's instructions to retry the original saved
@@ -72,5 +81,6 @@ Setup permits additive catalog updates while preserving existing board bindings
 and encryption recipients. If it reports an incompatible policy change, retain
 your configuration and saved requests and contact the organizer.
 
-This repository distributes participant releases. The maintained source and
-build process remain in the benchmark repository. No hosted service runs here.
+This repository distributes participant releases and includes the v0.2.2 client
+source. Install from a release bundle; this branch does not replace an already
+installed client until a new bundle is published. No hosted service runs here.

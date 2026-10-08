@@ -2,12 +2,13 @@
 import argparse
 from contextlib import ExitStack
 from datetime import datetime, timezone
-import getpass
+import os
 from pathlib import Path
 import sys
 import time
 
 from .contracts import identifier, SubmissionError
+from .secrets import SecretFileError, YUKON_API_TOKEN, VE_API_KEY, configured_values, has_secret, prompt_secret
 from .flow import prepare, run_until_pause
 from .gateway import GatewayClient
 from .journal import Journal
@@ -83,14 +84,17 @@ def main(argv=None):
             journal.stop()
             show(journal.read())
             # The local stop is durable even if network/authentication is unavailable.
-        if not sys.stdin.isatty() or not sys.stderr.isatty():
+        file_values = configured_values()
+        # start and resume still confirm in the terminal. stop only needs a terminal when the Yukon key is missing.
+        needs_terminal = args.command in ("start", "resume") or not has_secret(YUKON_API_TOKEN, os.environ, file_values)
+        if needs_terminal and (not sys.stdin.isatty() or not sys.stderr.isatty()):
             raise ValueError("a private interactive terminal is required")
         policy_path = Path.home().resolve() / ".config" / "ve-submit" / "policy.json"
         policy = load_policy(policy_path)
         if args.command == "start" and policy_path.is_relative_to(args.checkout.resolve()):
             raise ValueError("install trusted policy outside the submission checkout")
         with ExitStack() as resources:
-            yukon_key = getpass.getpass("Your Yukon API key (hidden): ")
+            yukon_key = prompt_secret("Your Yukon API key", YUKON_API_TOKEN, os.environ, file_values)
             gateway = GatewayClient(yukon_key, policy)
             resources.callback(gateway.close)
             if args.command == "stop":
@@ -100,7 +104,7 @@ def main(argv=None):
             yukon = YukonClient(yukon_key, policy)
             resources.callback(yukon.close)
             del yukon_key
-            ve_key = getpass.getpass("Your personal VE API key (hidden): ")
+            ve_key = prompt_secret("Your personal VE API key", VE_API_KEY, os.environ, file_values)
             ve = VEClient(ve_key, policy)
             resources.callback(ve.close)
             del ve_key
@@ -122,6 +126,9 @@ def main(argv=None):
                 reconcile_submission=getattr(args, "reconcile_submission", None))
             show(state)
             return 0 if state["milestone"] == "published" else 2
+    except SecretFileError as error:
+        print(str(error), file=sys.stderr)
+        return 2
     except KeyboardInterrupt:
         if journal is not None:
             journal.suspend("pending")
