@@ -1,62 +1,91 @@
-# ve-submit — consolidated VirtualEmbryo staging challenge
+# ve-submit 0.2.5 — consolidated VirtualEmbryo staging
 
-This dev release replaces the previous staging challenges with one challenge
-containing five boards. Four boards are open for this release; T1 remains paused
-while Yukon’s artifact-selection issue is fixed. Previous dev submissions do not carry over.
+This release combines the v0.2.4 client features with the new consolidated
+contest configuration. Use **v0.2.5-staging** in place of v0.2.4-staging or
+v0.2.3-consolidated-staging.
 
-**Current release: [v0.2.3-consolidated-staging](https://github.com/MC1823315/ve-submit/releases/tag/v0.2.3-consolidated-staging).**
-
-Use this release for the consolidated challenge, including if you previously
-installed v0.2.4-staging. The client code remains 0.2.3; this release name
-identifies the new five-board catalog. Access covers all five boards.
+Four boards are open: T2 embryo interpolation, T2 heart extrapolation,
+T2 heart interpolation, and T3 Gata4. T1 remains paused while Yukon's
+artifact-selection issue is fixed.
 
 ## Install
 
-Download the [release archive](https://github.com/MC1823315/ve-submit/releases/download/v0.2.3-consolidated-staging/ve-submit-v0.2.3-consolidated-staging.tar.gz)
-and its [checksum](https://github.com/MC1823315/ve-submit/releases/download/v0.2.3-consolidated-staging/ve-submit-v0.2.3-consolidated-staging.tar.gz.sha256). Verify the checksum,
-extract the archive, and enter the extracted directory. Python 3.12 is required.
+Download the archive and its `.sha256` file from
+[v0.2.5-staging](https://github.com/MC1823315/ve-submit/releases/tag/v0.2.5-staging),
+verify the checksum, extract the archive, and enter the extracted directory.
+You need **CPython 3.12 on macOS or Linux** and access to PyPI for the locked
+dependencies. Windows users can use WSL.
 
-If you installed an earlier VE staging client, remove its two old staging
-configuration files before installing this replacement catalog:
+For a first installation, or an upgrade from **v0.2.3-consolidated-staging**:
 
 ```sh
-rm -f "$HOME/.config/ve-submit/hosted-policy.json" \
-      "$HOME/.config/ve-submit/hosted-catalog.json"
 python3.12 -I install.py
 ```
 
-For a first installation, only the second command is needed. Installation does
-not ask for keys or submit a model. The bundle's generic instructions describe
-an older pilot alongside additional boards; this release uses only the new
-five-board catalog and the explicit board selections below.
+If upgrading from **v0.2.4-staging or an earlier staging contest**, first move
+the two old contest configuration files into a backup directory:
+
+```sh
+config_dir="$HOME/.config/ve-submit"
+backup_dir=$(mktemp -d "$config_dir/catalog-backup.XXXXXX")
+for name in hosted-policy.json hosted-catalog.json; do
+  if [ -f "$config_dir/$name" ]; then
+    mv "$config_dir/$name" "$backup_dir/$name"
+  fi
+done
+python3.12 -I install.py
+```
+
+This retains your `.env`, prior installations, and saved request files.
+Submissions from the old contest do not carry over to the new contest.
+Installation does not request keys, grant membership, or submit a model.
+
+## API keys
+
+The client reads `YUKON_API_TOKEN` and `VE_API_KEY` from your environment or
+`~/.config/ve-submit/.env`; environment values take precedence. A missing key
+is requested at a hidden prompt. The env file must be owned by you and private:
+
+```sh
+chmod 600 "$HOME/.config/ve-submit/.env"
+```
+
+Use your own Yukon and VE staging keys. Keep the file outside your model
+checkout. An optional `VE_SUBMIT_ENV` can select a different private env file.
+The client still asks for confirmation before starting a submission.
 
 ## Submit
 
-Choose a board explicitly:
+Complete the contest's data preparation and account activation, then choose
+an open board explicitly:
 
 | Board | Selection |
 |---|---|
-| T1 temporal — paused | `t1-temporal-val` |
 | T2 embryo interpolation | `t2-embryo-interp` |
 | T2 heart extrapolation | `t2-heart-extrap` |
 | T2 heart interpolation | `t2-heart-interp` |
 | T3 Gata4 | `t3-gata4` |
+| T1 temporal — paused | `t1-temporal-val` |
 
 ```sh
 ~/.local/bin/ve-submit hosted start \
   --board t2-heart-interp \
   --checkout /absolute/path/to/model-checkout \
   --note /absolute/path/to/research-note.txt \
-  --model "Your model description"
+  --model "Your scientific model description"
 ```
 
-The client privately requests your own Yukon and VE staging keys. Keep the
-printed run ID. If a new-challenge submission is interrupted, resume that
-saved request with `ve-submit hosted submit RUN_ID`.
+Retain the printed run ID and the private files under
+`~/.local/state/ve-submit-hosted/`. If a new-contest submission is interrupted,
+follow the client's guidance to resume its saved request with
+`~/.local/bin/ve-submit hosted submit RUN_ID`. Do not start another request to
+recover an uncertain upload.
 
-Each of the four open boards has two concurrent workflows. T1 rejects new submissions while paused. VE account
-quotas continue to apply independently of these workflow slots.
+Each open board allows two concurrent workflows. VE account quotas apply
+independently. T1 rejects new submissions while paused.
 
-This repository distributes participant client bundles. Installation does not
-grant challenge membership. Client source remains in the private benchmark
-repository; install from the release archive.
+The launcher uses an isolated Python interpreter. Keep the installation and
+configuration outside your model checkout.
+
+This repository distributes participant release bundles. Client source is maintained
+in the private benchmark repository; install from the release archive.
