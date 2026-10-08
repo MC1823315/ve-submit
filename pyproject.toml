@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools==80.9.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ve-submit"
+version = "0.2.2"
+description = "Participant-local, resumable Yukon to VE staging submission"
+requires-python = ">=3.12"
+dependencies = [
+    "httpx==0.28.1",
+    "pynacl==1.6.2",
+]
+
+[project.scripts]
+ve-submit = "ve_submit.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
