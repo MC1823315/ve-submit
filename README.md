@@ -1,7 +1,8 @@
-# ve-submit 0.2.6 — consolidated VirtualEmbryo staging
+# ve-submit 0.2.7 — consolidated VirtualEmbryo staging
 
-This release preserves v0.2.5's client features and consolidated contest
-configuration. Use **v0.2.6-staging** for the consolidated contest.
+This release preserves v0.2.6's client features and replaces only the T2 heart
+interpolation catalog entry with its new copy-last baseline. The other four
+benchmark IDs and baseline bindings are unchanged. Use **v0.2.7-staging** for the consolidated contest.
 Use the archive, checksum, and installation guide from the same release.
 
 Four boards are open: T2 embryo interpolation, T2 heart extrapolation,
@@ -11,20 +12,20 @@ artifact-selection issue is fixed.
 ## Install
 
 Download the archive and its `.sha256` file from
-[v0.2.6-staging](https://github.com/MC1823315/ve-submit/releases/tag/v0.2.6-staging),
+[v0.2.7-staging](https://github.com/MC1823315/ve-submit/releases/tag/v0.2.7-staging),
 verify the checksum, extract the archive, and enter the extracted directory.
 You need **CPython 3.12 on macOS or Linux** and access to PyPI for the locked
 dependencies. Windows users can use WSL.
 
-For a first installation, or an upgrade from **v0.2.5-staging** or
-**v0.2.3-consolidated-staging**:
+For a first installation:
 
 ```sh
 python3.12 -I install.py
 ```
 
-If upgrading from **v0.2.4-staging or an earlier staging contest**, first move
-the two old contest configuration files into a backup directory:
+If upgrading from **any earlier release**, including v0.2.6-staging, first move
+the two old contest configuration files into a backup directory. The installer
+requires this explicit transition because the heart interpolation ID changed:
 
 ```sh
 config_dir="$HOME/.config/ve-submit"
@@ -38,7 +39,8 @@ python3.12 -I install.py
 ```
 
 This retains your `.env`, prior installations, and saved request files.
-Submissions from the old contest do not carry over to the new contest.
+Saved requests keep their original board identity. The archived heart interpolation
+board does not accept new submissions; start a new request for the replacement.
 Installation does not request keys, grant membership, or submit a model.
 The consolidated catalog is installed at
 `~/.config/ve-submit/hosted-catalog.json`. Do not edit its board IDs or endpoints.
@@ -93,6 +95,3 @@ independently. T1 rejects new submissions while paused.
 
 The launcher uses an isolated Python interpreter. Keep the installation and
 configuration outside your model checkout.
-
-This repository distributes participant release bundles. Client source is maintained
-in the private benchmark repository; install from the release archive.
