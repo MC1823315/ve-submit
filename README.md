@@ -1,8 +1,8 @@
-# ve-submit 0.2.5 — consolidated VirtualEmbryo staging
+# ve-submit 0.2.6 — consolidated VirtualEmbryo staging
 
-This release combines the v0.2.4 client features with the new consolidated
-contest configuration. Use **v0.2.5-staging** in place of v0.2.4-staging or
-v0.2.3-consolidated-staging.
+This release preserves v0.2.5's client features and consolidated contest
+configuration. Use **v0.2.6-staging** for the consolidated contest.
+Use the archive, checksum, and installation guide from the same release.
 
 Four boards are open: T2 embryo interpolation, T2 heart extrapolation,
 T2 heart interpolation, and T3 Gata4. T1 remains paused while Yukon's
@@ -11,12 +11,13 @@ artifact-selection issue is fixed.
 ## Install
 
 Download the archive and its `.sha256` file from
-[v0.2.5-staging](https://github.com/MC1823315/ve-submit/releases/tag/v0.2.5-staging),
+[v0.2.6-staging](https://github.com/MC1823315/ve-submit/releases/tag/v0.2.6-staging),
 verify the checksum, extract the archive, and enter the extracted directory.
 You need **CPython 3.12 on macOS or Linux** and access to PyPI for the locked
 dependencies. Windows users can use WSL.
 
-For a first installation, or an upgrade from **v0.2.3-consolidated-staging**:
+For a first installation, or an upgrade from **v0.2.5-staging** or
+**v0.2.3-consolidated-staging**:
 
 ```sh
 python3.12 -I install.py
@@ -39,6 +40,8 @@ python3.12 -I install.py
 This retains your `.env`, prior installations, and saved request files.
 Submissions from the old contest do not carry over to the new contest.
 Installation does not request keys, grant membership, or submit a model.
+The consolidated catalog is installed at
+`~/.config/ve-submit/hosted-catalog.json`. Do not edit its board IDs or endpoints.
 
 ## API keys
 
@@ -59,13 +62,17 @@ The client still asks for confirmation before starting a submission.
 Complete the contest's data preparation and account activation, then choose
 an open board explicitly:
 
-| Board | Selection |
-|---|---|
-| T2 embryo interpolation | `t2-embryo-interp` |
-| T2 heart extrapolation | `t2-heart-extrap` |
-| T2 heart interpolation | `t2-heart-interp` |
-| T3 Gata4 | `t3-gata4` |
-| T1 temporal — paused | `t1-temporal-val` |
+| Board | Selection | Editable source folder |
+|---|---|---|
+| T2 embryo interpolation | `t2-embryo-interp` | `solution-t2-embryo-interp/` |
+| T2 heart extrapolation | `t2-heart-extrap` | `solution-t2-heart-extrap/` |
+| T2 heart interpolation | `t2-heart-interp` | `solution/` |
+| T3 Gata4 | `t3-gata4` | `solution-t3/` |
+| T1 temporal — paused | `t1-temporal-val` | `solution-t1/` |
+
+Pass the checkout root to `--checkout`. The client packages only the source
+folder for the selected board. Keep data, notes, and credentials outside that
+folder. Run local prediction code without your API keys in its environment.
 
 ```sh
 ~/.local/bin/ve-submit hosted start \
