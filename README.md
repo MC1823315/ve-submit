@@ -1,115 +1,102 @@
-# ve-submit 0.2.8 — installation for consolidated VirtualEmbryo staging
+# Install ve-submit 0.2.9
 
-This is the **installation and upgrade guide** for `v0.2.8-staging`. The release
-preserves v0.2.7's runtime, dependencies, and five-board catalog; it corrects
-participation guidance. Use the archive, checksum, and guide from the same release.
+Use the [v0.2.9-staging release](https://github.com/Layr-Labs/ve-bprime-benchmark/releases/tag/v0.2.9-staging)
+for the current dataset-enabled staging client. It requires access to the private
+repository. Download its archive, checksum and separate `CLIENT-TRANSITION.md`
+asset. The newest release assets in the older `MC1823315/ve-submit` distribution
+are still `v0.2.8-staging`; those bindings differ from this release.
 
-For accounts, data preparation, local prediction/validation, task rules, research
-notes, and recovery, use the complete
-[Participation guide](https://github.com/Layr-Labs/ve-bprime-benchmark/blob/main/docs/participation.md)
-after the organizer grants private repository access. Installation does not grant
-that access, contest membership, or individual activation.
-
-All five boards were open on **October 9, 2026**, including T1. Check the selected
-live board before starting; availability and capacity can change.
-
-## Install
-
-Download the archive and accompanying checksum from the
-[v0.2.8-staging release](https://github.com/MC1823315/ve-submit/releases/tag/v0.2.8-staging).
-Verify the archive's SHA-256 against that release's checksum, then extract it.
-Run the installer from the extracted directory, outside your model checkout.
-You need **CPython 3.12 on macOS or Linux** and access to PyPI for the locked
-dependencies. Windows users can use WSL.
-
-For a first installation:
+You need **CPython 3.12 on macOS or Linux** and internet access to PyPI for the
+locked dependencies. Windows users can use WSL. Install outside your model
+checkout. From the download directory:
 
 ```sh
+shasum -a 256 -c ve-submit-v0.2.9-staging.tar.gz.sha256
+tar -xzf ve-submit-v0.2.9-staging.tar.gz
+cd ve-submit-v0.2.9-staging
 python3.12 -I install.py
 export PATH="$HOME/.local/bin:$PATH"
 ve-submit hosted start --help
 ```
 
-The installer verifies the bundled manifest, wheel, policy/catalog, and locked
-dependencies. The launcher uses isolated Python. Installation never requests
-keys, submits a model, or opens a board.
+Continue only if the checksum succeeds. The archive SHA-256 is
+`5da9712520571c5b46ae023b36af33fcd34cb49b9024d61c4b8ac4f92c0ab18d`.
+Setup verifies the bundled files, installs an isolated client environment and
+the supplied catalog. It does not request submission keys, submit a model, grant
+membership or activate a board. Administrator access is not needed.
 
-Upgrading from v0.2.7 preserves the same board bindings and needs no catalog
-migration. Run the same installer; retain your existing configuration and saved
-requests. If upgrading from **v0.2.6 or earlier**, first back up the old contest
-configuration because the heart-interpolation identity changed in v0.2.7:
+If your shell cannot find the command, invoke `~/.local/bin/ve-submit` directly
+or add the PATH line above to your shell profile. Keep the client installation
+and configuration outside your model checkout.
 
-```sh
-config_dir="$HOME/.config/ve-submit"
-backup_dir=$(mktemp -d "$config_dir/catalog-backup.XXXXXX")
-for name in hosted-policy.json hosted-catalog.json; do
-  if [ -f "$config_dir/$name" ]; then
-    mv "$config_dir/$name" "$backup_dir/$name"
-  fi
-done
-python3.12 -I install.py
-```
+## Upgrade
 
-This retains `.env`, prior installations, and saved request files. Saved requests
-keep their original board identity; they do not migrate to the replacement board.
-The catalog is installed at `~/.config/ve-submit/hosted-catalog.json`. Never edit
-its IDs/endpoints to bypass a conflict. Ask the organizer to reconcile unexpected
-configuration differences.
+Read both this guide and the release's `CLIENT-TRANSITION.md`. Identify the
+previous **release tag**, because several different releases used package
+version 0.2.8.
 
-Use the GitHub release channel above until the selected staging API's client
-version, guide, installer, and archive are verified as available. Do not substitute
-a production installer or an unconfigured API URL.
+| Previous release | Upgrade to 0.2.9 |
+| --- | --- |
+| `v0.2.8-generation-datasets-staging` | Run the verified 0.2.9 installer normally. The client modules, installer, dependencies and five-board catalog are unchanged; the package version becomes 0.2.9. |
+| `v0.2.8-reliability-staging` | The catalog differs. Preserve the old installation and request state; use the organizer's reviewed transition for that catalog. |
+| Public `v0.2.8-staging`, or an earlier release | The catalog differs. Preserve the old installation and request state; use the organizer's reviewed transition for that catalog. |
 
-## Personal API keys
+Preserve `~/.config/ve-submit/.env`, any private file selected by
+`VE_SUBMIT_ENV`, the existing policy/catalog files, prior release directories
+under `~/.local/share/ve-submit/releases/`, and all of
+`~/.local/state/ve-submit-hosted/`. The installer retains previous release
+environments and saved requests.
 
-The client reads `YUKON_API_TOKEN` and `VE_API_KEY` from your environment or
-`~/.config/ve-submit/.env`; environment values take precedence. Missing keys use
-hidden prompts. The file must be owned by you and private:
+If setup says an existing policy differs, stop. Do not delete or hand-edit a
+catalog, change IDs or recipients, or move private request files to make setup
+pass. The published transition note does not provide a universal migration
+command for older catalogs. Have the organizer reconcile unresolved requests
+and confirm the transition for your exact installed catalog before switching.
 
-```sh
-chmod 600 "$HOME/.config/ve-submit/.env"
-```
+## Prepare and submit
 
-Use your own **Yukon dev** and **VE staging** keys. Keep them outside the model
-checkout and out of model execution, command arguments, research notes, and chat.
-`VE_SUBMIT_ENV` can select another private env file. The client asks for submission
-confirmation; a coding assistant does not handle your keys.
+Follow the [participation guide](https://github.com/Layr-Labs/ve-bprime-benchmark/blob/staging/consolidated/docs/participation.md)
+for accounts, approved dataset access, source preparation, local validation and
+research notes. Released supplemental inputs are available during hosted
+generation; primary input aliases and output panels remain board-specific.
+The two heart boards exclude `E8.5_RNA.h5ad` from their hosted views under the
+staging rule interpretation.
 
-## Select the board
-
-| Board | `--board` selection | Editable source folder |
-| --- | --- | --- |
-| T2 heart interpolation | `t2-heart-interp` | `solution/` |
-| T2 heart extrapolation | `t2-heart-extrap` | `solution-t2-heart-extrap/` |
-| T2 embryo interpolation | `t2-embryo-interp` | `solution-t2-embryo-interp/` |
-| T3 Gata4 | `t3-gata4` | `solution-t3/` |
-| T1 temporal | `t1-temporal-val` | `solution-t1/` |
-
-Complete data preparation, local validation, research note, and account activation
-using the full Participation guide. Pass the checkout root to `--checkout`; only
-the selected source folder is packaged. Keep data, generated predictions, notes,
-and credentials outside that folder.
-
-Our EigenLab Yukon team uses the **human track**, including when a coding
-assistant helps. Supply a scientific model description and research note;
-omit `--agent-framework`, `--agent-model`, and `--evidence`.
+Always select the intended board explicitly. For example:
 
 ```sh
-~/.local/bin/ve-submit hosted start \
+ve-submit hosted start \
   --board t2-heart-interp \
   --checkout /absolute/path/to/model-checkout \
   --note /absolute/path/to/research-note.txt \
   --model "Your scientific model description"
 ```
 
-Retain the local run ID, Yukon submission ID, and private files under
-`~/.local/state/ve-submit-hosted/`. Follow with `ve-submit hosted status RUN_ID`.
-If admission is uncertain, follow the full guide to resume the same saved request
-with `ve-submit hosted submit RUN_ID`; do not start another request to recover
-an uncertain upload.
+This contest accepts human-team submissions only. Omit `--agent-framework`,
+`--agent-model` and `--evidence`, including when a coding assistant helps.
+Use your own Yukon dev and VE staging keys. The client reads them from your
+environment or private configuration, or prompts privately when missing; it
+asks for submission confirmation. Never put keys in command arguments, source,
+research notes or chat. Check current board availability and your own quota
+before starting.
 
-Each board advertised two concurrent Yukon workflows on October 9, 2026.
-Your daily personal VE staging allowance is separate; the client's live quota
-check is authoritative. Direct staging uploads use that same allowance. Official
-production contest rules have separate phase-specific limits. Staging scores are
-development feedback, not evidence of final P3 performance.
+## Saved requests and recovery
+
+Retain the printed local run ID, Yukon submission ID and private request
+directory. With the original compatible configuration:
+
+```sh
+ve-submit hosted status SAVED_RUN_ID
+```
+
+If admission was interrupted, the participation guide explains when
+`ve-submit hosted submit SAVED_RUN_ID` can retry the same saved request.
+An acknowledged run should be followed by its original submission ID.
+Do not run `hosted start` again to recover an uncertain admission or upload.
+
+Saved requests retain their original binding and recipient. Upgrading does not
+migrate them or renew their authorization. If status or recovery reports a
+configuration mismatch, expired authorization or uncertain upload, keep the
+original files and contact the organizer. Do not guess a board, restore a
+catalog merely to force replay, or rewrite a request. An old client environment
+alone cannot make an old request compatible with the current service.
